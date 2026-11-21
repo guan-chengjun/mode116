@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>啤酒灌装流水线 3D 运行仿真</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Three.js 及扩展模块 CDN 映射 -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- 3D 画布挂载点 -->
+  <div id="app"></div>
+
+  <!-- 左上：控制面板 -->
+  <section class="panel" id="control-panel">
+    <h2 class="panel-title">灌装线控制台</h2>
+
+    <div class="btn-row">
+      <button id="btn-start" class="btn btn-start">全线启动</button>
+      <button id="btn-pause" class="btn btn-pause" disabled>暂停</button>
+    </div>
+    <div class="btn-row">
+      <button id="btn-estop" class="btn btn-estop">急停</button>
+      <button id="btn-reset" class="btn btn-reset">复位</button>
+    </div>
+
+    <div class="form-item">
+      <label for="speed-range">线速调节 <span id="speed-val">1.0×</span></label>
+      <input type="range" id="speed-range" min="0.5" max="2" step="0.1" value="1" />
+    </div>
+
+    <div class="form-item">
+      <label for="cap-select">瓶装容量</label>
+      <select id="cap-select">
+        <option value="330ml">330 ml</option>
+        <option value="500ml">500 ml</option>
+      </select>
+    </div>
+
+    <div class="form-item">
+      <label for="color-select">瓶身配色</label>
+      <select id="color-select">
+        <option value="琥珀棕">琥珀棕</option>
+        <option value="墨绿">墨绿</option>
+        <option value="透明白">透明白</option>
+      </select>
+    </div>
+
+    <div class="form-item switch-row">
+      <label for="fault-check">随机故障注入</label>
+      <input type="checkbox" id="fault-check" checked />
+    </div>
+    <div class="form-item switch-row">
+      <label for="wall-check">隐藏车间外墙</label>
+      <input type="checkbox" id="wall-check" />
+    </div>
+  </section>
+
+  <!-- 右上：运行数据 -->
+  <section class="panel" id="stats-panel">
+    <h2 class="panel-title">实时运行数据</h2>
+    <div class="stat-grid">
+      <div class="stat-cell">
+        <span class="stat-label">当前线速</span>
+        <span class="stat-value" id="stat-speed">0 m/min</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-label">已灌装瓶数</span>
+        <span class="stat-value" id="stat-filled">0</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-label">合格 / 剔除</span>
+        <span class="stat-value"><span id="stat-good">0</span> / <span id="stat-reject">0</span></span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-label">合格率</span>
+        <span class="stat-value" id="stat-pass">100%</span>
+      </div>
+    </div>
+
+    <h3 class="sub-title">工位状态</h3>
+    <ul class="station-list" id="station-list"><!-- JS 动态生成 --></ul>
+
+    <h3 class="sub-title">故障日志</h3>
+    <ul class="fault-log" id="fault-log">
+      <li class="log-empty">暂无故障记录</li>
+    </ul>
+  </section>
+
+  <!-- 底部：机位切换 -->
+  <nav class="cam-bar">
+    <button class="cam-btn active" data-cam="overview">全线俯视</button>
+    <button class="cam-btn" data-cam="follow">跟随单瓶</button>
+    <button class="cam-btn" data-cam="closeup">工位特写</button>
+    <span class="cam-tip">左键环绕 · 滚轮缩放 · 右键平移 · 点击工位查看说明</span>
+  </nav>
+
+  <!-- 工位信息卡 -->
+  <section class="panel info-card" id="info-card" hidden>
+    <button id="info-close" class="info-close">×</button>
+    <h2 class="panel-title" id="info-name">设备名称</h2>
+    <p class="info-status">当前状态：<b id="info-status">待机</b></p>
+    <p class="info-desc" id="info-desc">工序说明</p>
+  </section>
+
+  <!-- 模型加载提示 -->
+  <div id="toast-wrap"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
